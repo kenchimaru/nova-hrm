@@ -27,7 +27,6 @@ func CreateUserWithPassword(
 	}
 
 	d := fc.Collection(collection).NewDoc()
-	log.Printf("Document ID: %s", d.ID)
 	// Convert the struct to a map dynamically
 	dataMap := make(map[string]interface{})
 

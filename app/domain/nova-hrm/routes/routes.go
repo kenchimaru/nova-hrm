@@ -3,6 +3,7 @@ package routes
 import (
 	"net/http"
 	liveness "nova-hrm/app/domain/nova-hrm/handlers"
+	"nova-hrm/app/domain/nova-hrm/handlers/auth/login/v1"
 	"nova-hrm/app/domain/nova-hrm/handlers/auth/register/v1"
 
 	"github.com/gorilla/mux"
@@ -16,5 +17,6 @@ func RegisterRoutes(router *mux.Router) {
 	v1 := api.PathPrefix("/v1").Subrouter()
 	{
 		register.RegisterRoutes(v1)
+		login.RegisterRoutes(v1)
 	}
 }
