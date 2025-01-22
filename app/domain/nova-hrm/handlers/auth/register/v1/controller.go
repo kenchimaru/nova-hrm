@@ -3,7 +3,6 @@ package register
 import (
 	"encoding/json"
 	"net/http"
-	"nova-hrm/app/domain/nova-hrm/models"
 	"nova-hrm/app/domain/nova-hrm/response"
 	"nova-hrm/app/domain/nova-hrm/validators"
 )
@@ -31,15 +30,20 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Prepare user object
-	user := models.User{
-		Username: registerReq.Username,
-		Password: registerReq.Password,
-		Email:    registerReq.Email,
+	encPassword, err := HashPassword(registerReq.Password)
+
+	if err != nil {
+		response.Error(w, "Error hashing password", http.StatusInternalServerError)
+
+		return
 	}
 
 	// Save user to Firestore
-	docRef, err := CreateUser(user)
+	docId, err := CreateUser(
+		registerReq.Username,
+		encPassword,
+		registerReq.Email,
+	)
 	if err != nil {
 		response.Error(w, "Error creating user", http.StatusInternalServerError)
 
@@ -51,6 +55,6 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		"User created successfully",
 		http.StatusCreated,
 		map[string]string{
-			"document_id": docRef.ID,
+			"document_id": docId,
 		})
 }
