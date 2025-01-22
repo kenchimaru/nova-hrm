@@ -9,6 +9,6 @@ import (
 // RegisterRoutes registers all the application routes
 func RegisterRoutes(router *mux.Router) {
 	{
-		router.HandleFunc("/register", Register).Methods(http.MethodPost)
+		router.HandleFunc("/register", HandleRegister).Methods(http.MethodPost)
 	}
 }
