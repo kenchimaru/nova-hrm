@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"nova-hrm/app/domain/nova-hrm/response"
+	"nova-hrm/app/domain/nova-hrm/utils"
 	"nova-hrm/app/domain/nova-hrm/validators"
 )
 
@@ -30,7 +31,7 @@ func HandleRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	encPassword, err := HashPassword(registerReq.Password)
+	encPassword, err := utils.HashPassword(registerReq.Password)
 
 	if err != nil {
 		response.Error(w, "Error hashing password", http.StatusInternalServerError)
@@ -39,7 +40,7 @@ func HandleRegister(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Save user to Firestore
-	docId, err := CreateUser(
+	docId, err := createUser(
 		registerReq.Username,
 		encPassword,
 		registerReq.Email,

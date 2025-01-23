@@ -14,7 +14,7 @@ import (
 var collection = "Users"
 
 // CreateUser creates a new user in the database
-func CreateUserWithPassword(
+func createUserWithPassword(
 	username string,
 	password string,
 	email string,

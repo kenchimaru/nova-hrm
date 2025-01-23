@@ -3,12 +3,15 @@ package login
 import (
 	"context"
 	"errors"
+	"log"
 	"nova-hrm/app/domain/nova-hrm/database"
+	"nova-hrm/app/domain/nova-hrm/models"
+	"nova-hrm/app/domain/nova-hrm/utils"
 
 	"cloud.google.com/go/firestore"
 )
 
-func GetUserByUsername(username string) (*firestore.DocumentSnapshot, error) {
+func getUserByUsername(username string) (*models.User, error) {
 	ctx := context.Background()
 	fc, err := database.GetFirestoreClient(ctx)
 
@@ -25,5 +28,41 @@ func GetUserByUsername(username string) (*firestore.DocumentSnapshot, error) {
 		return nil, errors.New("user not found")
 	}
 
-	return user, nil
+	var userModel models.User
+	err = utils.MapDocumentToModel(user, &userModel)
+
+	if err != nil {
+		return nil, err
+
+	}
+	return &userModel, nil
+}
+
+func updateUserAccessToken(id string, accessToken string) error {
+	ctx := context.Background()
+	fc, err := database.GetFirestoreClient(ctx)
+
+	if err != nil {
+		return err
+	}
+
+	err = fc.RunTransaction(ctx, func(ctx context.Context, tx *firestore.Transaction) error {
+		docRef := fc.Collection("Users").Doc(id)
+		log.Printf("Updating access token for user: %v", id)
+		err := tx.Set(docRef, map[string]interface{}{
+			"AccessToken": accessToken,
+		}, firestore.MergeAll)
+
+		if err != nil {
+			return errors.New("error updating access token")
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

@@ -2,7 +2,6 @@ package login
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
 	"nova-hrm/app/domain/nova-hrm/response"
 	"nova-hrm/app/domain/nova-hrm/validators"
@@ -27,14 +26,13 @@ func HandleUserLogin(w http.ResponseWriter, r *http.Request) {
 
 	// Validate the request
 	if err := validators.Validate.Struct(loginReq); err != nil {
-		log.Printf("Validation error: %v", err)
 		response.Error(w, "Bad request", http.StatusBadRequest)
 
 		return
 	}
 
 	// Authenticate user
-	err := AuthenticateWithPassword(loginReq.Username, loginReq.Password)
+	user, err := authenticateWithPassword(loginReq.Username, loginReq.Password)
 
 	if err != nil {
 		response.Error(w, "Invalid username or password", http.StatusUnauthorized)
@@ -42,5 +40,22 @@ func HandleUserLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response.Success(w, "Login successful", http.StatusOK, nil)
+	accessToken, err := updateJwtToken(user.ID, user.Username, user.Role)
+	if err != nil {
+		response.Error(w, "Error updating access token", http.StatusInternalServerError)
+
+		return
+
+	}
+
+	data := map[string]string{
+		"accessToken": accessToken,
+	}
+
+	response.Success(
+		w,
+		"Login successful",
+		http.StatusOK,
+		data,
+	)
 }
