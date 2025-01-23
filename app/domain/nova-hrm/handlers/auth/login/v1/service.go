@@ -30,10 +30,10 @@ func authenticateWithPassword(username string, password string) (*models.User, e
 	return user, nil
 }
 
-func updateJwtToken(id string, username string, role string) (string, error) {
-	accessToken := utils.GenerateJWT(username, role)
+func updateJwtToken(user_id string, username string, role string) (string, error) {
+	accessToken := utils.GenerateJWT(user_id, username, role)
 
-	error := updateUserAccessToken(id, accessToken)
+	error := updateUserAccessToken(user_id, accessToken)
 
 	if error != nil {
 		return "", error

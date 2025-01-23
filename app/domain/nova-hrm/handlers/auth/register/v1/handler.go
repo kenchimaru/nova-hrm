@@ -2,7 +2,10 @@ package register
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
+	"nova-hrm/app/domain/nova-hrm/middleware"
+	"nova-hrm/app/domain/nova-hrm/models"
 	"nova-hrm/app/domain/nova-hrm/response"
 	"nova-hrm/app/domain/nova-hrm/utils"
 	"nova-hrm/app/domain/nova-hrm/validators"
@@ -14,8 +17,24 @@ type RegisterRequest struct {
 	Email    string `json:"email" validate:"required,email"`
 }
 
-func HandleRegister(w http.ResponseWriter, r *http.Request) {
+func HandleAddUser(w http.ResponseWriter, r *http.Request) {
 	var registerReq RegisterRequest
+	var requestUser *models.User
+
+	requestUser, ok := r.Context().Value(middleware.UserContextKey).(*models.User)
+	fmt.Println(requestUser)
+
+	if !ok {
+		response.Error(w, "Unauthorized access", http.StatusUnauthorized)
+
+		return
+	}
+
+	if requestUser.Role != "admin" {
+		response.Error(w, "Unauthorized access", http.StatusUnauthorized)
+
+		return
+	}
 
 	// Parse JSON request
 	if err := json.NewDecoder(r.Body).Decode(&registerReq); err != nil {

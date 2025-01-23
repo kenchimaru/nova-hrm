@@ -2,6 +2,7 @@ package database
 
 import (
 	"context"
+	"fmt"
 	"log"
 
 	"cloud.google.com/go/firestore"
@@ -14,6 +15,10 @@ var Client *firestore.Client
 
 // NewFirestoreClient initializes a new Firestore client
 func InitFirestoreClient(ctx context.Context) (*firestore.Client, error) {
+	if Client != nil {
+		return Client, nil
+	}
+
 	log.Println("Initializing Firestore client")
 	sa := option.WithCredentialsFile("serviceAccountKey.json")
 	app, err := firebase.NewApp(ctx, nil, sa)
@@ -33,6 +38,7 @@ func InitFirestoreClient(ctx context.Context) (*firestore.Client, error) {
 
 func GetFirestoreClient(ctx context.Context) (*firestore.Client, error) {
 	if Client == nil {
+		fmt.Println("Client is nil")
 		return InitFirestoreClient(ctx)
 	}
 

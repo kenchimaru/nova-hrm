@@ -3,7 +3,6 @@ package register
 import (
 	"context"
 	"errors"
-	"log"
 	"nova-hrm/app/domain/nova-hrm/database"
 	"nova-hrm/app/domain/nova-hrm/models"
 	"strings"
@@ -43,7 +42,6 @@ func createUserWithPassword(
 			return errors.New("bad request")
 		}
 
-		log.Printf("Email snapshot: %v", emailSanpShot.Exists())
 		if emailSanpShot.Exists() {
 			return errors.New("email already exist")
 		}

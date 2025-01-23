@@ -3,7 +3,6 @@ package login
 import (
 	"context"
 	"errors"
-	"log"
 	"nova-hrm/app/domain/nova-hrm/database"
 	"nova-hrm/app/domain/nova-hrm/models"
 	"nova-hrm/app/domain/nova-hrm/utils"
@@ -38,7 +37,7 @@ func getUserByUsername(username string) (*models.User, error) {
 	return &userModel, nil
 }
 
-func updateUserAccessToken(id string, accessToken string) error {
+func updateUserAccessToken(user_id string, accessToken string) error {
 	ctx := context.Background()
 	fc, err := database.GetFirestoreClient(ctx)
 
@@ -47,8 +46,7 @@ func updateUserAccessToken(id string, accessToken string) error {
 	}
 
 	err = fc.RunTransaction(ctx, func(ctx context.Context, tx *firestore.Transaction) error {
-		docRef := fc.Collection("Users").Doc(id)
-		log.Printf("Updating access token for user: %v", id)
+		docRef := fc.Collection("Users").Doc(user_id)
 		err := tx.Set(docRef, map[string]interface{}{
 			"AccessToken": accessToken,
 		}, firestore.MergeAll)

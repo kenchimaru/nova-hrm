@@ -7,11 +7,12 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-func GenerateJWT(username string, role string) string {
+func GenerateJWT(id string, username string, role string) string {
 	secretKey := []byte(config.GetEnv("JWT_SECRET", "secret"))
 
 	// Create a new token
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"user_id":  username,
 		"username": username,
 		"role":     role,
 		"exp":      time.Now().Add(time.Hour * 24).Unix(), // Token expires in 24 hour
