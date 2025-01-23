@@ -26,13 +26,6 @@ func createUserWithPassword(
 	}
 
 	d := fc.Collection(collection).NewDoc()
-	// Convert the struct to a map dynamically
-	dataMap := make(map[string]interface{})
-
-	dataMap["ID"] = d.ID
-	dataMap["Username"] = username
-	dataMap["Email"] = email
-	dataMap["Password"] = password
 
 	err = fc.RunTransaction(ctx, func(ctx context.Context, tx *firestore.Transaction) error {
 		emailRef := fc.Collection("Emails").Doc(email)
@@ -57,7 +50,12 @@ func createUserWithPassword(
 			return errors.New("username already exist")
 		}
 
-		tx.Create(d, dataMap)
+		tx.Create(d, models.User{
+			ID:       d.ID,
+			Username: username,
+			Email:    email,
+			Password: password,
+		})
 
 		refPath := collection + "/" + d.ID
 		docIndex := models.DocumentIndex{

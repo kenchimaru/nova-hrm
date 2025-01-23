@@ -17,6 +17,10 @@ type RegisterRequest struct {
 	Email    string `json:"email" validate:"required,email"`
 }
 
+type registerResponse struct {
+	DocumentId string `json:"document_id"`
+}
+
 func HandleAddUser(w http.ResponseWriter, r *http.Request) {
 	var registerReq RegisterRequest
 	var requestUser *models.User
@@ -70,11 +74,14 @@ func HandleAddUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	data := registerResponse{
+		DocumentId: docId,
+	}
+
 	response.Success(
 		w,
 		"User created successfully",
 		http.StatusCreated,
-		map[string]string{
-			"document_id": docId,
-		})
+		data,
+	)
 }

@@ -4,6 +4,7 @@ import (
 	"errors"
 	"nova-hrm/app/domain/nova-hrm/models"
 	"nova-hrm/app/domain/nova-hrm/utils"
+	"time"
 )
 
 func authenticateWithPassword(username string, password string) (*models.User, error) {
@@ -40,4 +41,14 @@ func updateJwtToken(user_id string, username string, role string) (string, error
 	}
 
 	return accessToken, nil
+}
+
+func addAuthLog(user_id string, ipAddress string, action string, time time.Time) error {
+	err := createAuthLog(user_id, ipAddress, action, time)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

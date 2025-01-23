@@ -10,6 +10,6 @@ import (
 // RegisterRoutes registers all the application routes
 func RegisterRoutes(router *mux.Router) {
 	{
-		router.Handle("/user/add", middleware.Auth(http.HandlerFunc(HandleAddUser))).Methods(http.MethodPost)
+		router.Handle("/user/add", middleware.AuthAdmin(http.HandlerFunc(HandleAddUser))).Methods(http.MethodPost)
 	}
 }

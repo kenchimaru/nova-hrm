@@ -4,18 +4,26 @@ import (
 	"encoding/json"
 	"net/http"
 	"nova-hrm/app/domain/nova-hrm/response"
+	"nova-hrm/app/domain/nova-hrm/utils"
 	"nova-hrm/app/domain/nova-hrm/validators"
+	"time"
 )
 
 // LoginRequest represents the structure of a login request payload
-type LoginRequest struct {
+type loginRequest struct {
 	Username string `json:"username" validate:"required,min=6,max=50,startswithalpha"`
 	Password string `json:"password" validate:"required,min=6,max=50"`
 }
 
+type loginResponse struct {
+	AccessToken string `json:"access_token"`
+}
+
 // Login handles user login with mux router
 func HandleUserLogin(w http.ResponseWriter, r *http.Request) {
-	var loginReq LoginRequest
+	var loginReq loginRequest
+
+	ipAddress := utils.GetClientIP(r)
 
 	// Parse JSON request
 	if err := json.NewDecoder(r.Body).Decode(&loginReq); err != nil {
@@ -48,8 +56,12 @@ func HandleUserLogin(w http.ResponseWriter, r *http.Request) {
 
 	}
 
-	data := map[string]string{
-		"accessToken": accessToken,
+	now := time.Now().UTC()
+
+	addAuthLog(user.ID, ipAddress, "login", now)
+
+	data := loginResponse{
+		AccessToken: accessToken,
 	}
 
 	response.Success(
