@@ -30,11 +30,11 @@ func LoadConfig() *Config {
 		}
 
 		config = &Config{
-			Host:         getEnv("HOST", "localhost"),
-			DatabaseURL:  getEnv("DATABASE_URL", "localhost"),
-			DatabasePort: getEnv("DATABASE_PORT", "3306"),
-			Port:         getEnv("PORT", "8080"),
-			Env:          getEnv("ENV", "development"),
+			Host:         GetEnv("HOST", "localhost"),
+			DatabaseURL:  GetEnv("DATABASE_URL", "localhost"),
+			DatabasePort: GetEnv("DATABASE_PORT", "3306"),
+			Port:         GetEnv("PORT", "8080"),
+			Env:          GetEnv("ENV", "development"),
 		}
 	})
 
@@ -42,7 +42,7 @@ func LoadConfig() *Config {
 }
 
 // getEnv fetches a key from the environment or uses a default value
-func getEnv(key, defaultValue string) string {
+func GetEnv(key, defaultValue string) string {
 	if value, exists := os.LookupEnv(key); exists {
 		return value
 	}

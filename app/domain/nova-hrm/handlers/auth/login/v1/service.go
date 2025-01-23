@@ -2,43 +2,42 @@ package login
 
 import (
 	"errors"
-
-	"cloud.google.com/go/firestore"
-	"golang.org/x/crypto/bcrypt"
+	"nova-hrm/app/domain/nova-hrm/models"
+	"nova-hrm/app/domain/nova-hrm/utils"
 )
 
-// CheckPassword compares a hashed password with its possible plaintext equivalent
-func CheckPassword(hashedPassword, password string) bool {
-	err := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
+func authenticateWithPassword(username string, password string) (*models.User, error) {
 
-	return err == nil
-}
-
-func AuthenticateWithPassword(username string, password string) error {
-
-	user, err := GetUserByUsername(username)
+	user, err := getUserByUsername(username)
 
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	if user == nil {
-		return errors.New("user not found")
+		return nil, errors.New("user not found")
 	}
 
-	passwordData, err := user.DataAtPath(firestore.FieldPath{"Password"})
+	passwordData := user.Password
 	if err != nil {
-		return errors.New("error retrieving password data")
+		return nil, errors.New("error retrieving password data")
 	}
 
-	userPassword, ok := passwordData.(string)
-	if !ok {
-		return errors.New("password data is not a string")
+	if !utils.CheckPassword(passwordData, password) {
+		return nil, errors.New("invalid password")
 	}
 
-	if !CheckPassword(userPassword, password) {
-		return errors.New("invalid password")
+	return user, nil
+}
+
+func updateJwtToken(id string, username string, role string) (string, error) {
+	accessToken := utils.GenerateJWT(username, role)
+
+	error := updateUserAccessToken(id, accessToken)
+
+	if error != nil {
+		return "", error
 	}
 
-	return nil
+	return accessToken, nil
 }
